@@ -1,0 +1,62 @@
+# Quantitative Trading System Configuration
+
+# Strategy Parameters
+strategy:
+  name: "dual_momentum"
+  lookback_days: 252  # 12 months of trading days
+  rebalance_frequency: "monthly"  # End of month
+  universe:
+    - "SPY"   # S&P 500 ETF
+    - "QQQ"   # Nasdaq 100 ETF
+    - "TLT"   # 20+ Year Treasury Bond ETF (safe haven)
+
+# Risk Management (Hard Limits - from .copilot.md)
+risk:
+  max_position_size: 0.05         # 5% of portfolio per position
+  max_sector_exposure: 0.25       # 25% max sector exposure
+  daily_loss_limit: -0.02         # -2% daily loss triggers halt
+  weekly_loss_limit: -0.05        # -5% weekly loss limit
+  max_drawdown_halt: -0.15        # -15% from peak halts trading
+  require_stop_loss: true
+  position_sizing_method: "fixed"  # "fixed" or "kelly"
+  kelly_fraction: 0.25            # Use 1/4 Kelly if kelly method
+
+# Backtesting Parameters
+backtest:
+  start_date: "2014-01-01"
+  end_date: "2024-12-31"
+  initial_capital: 10000
+  transaction_cost_bps: 10        # 0.1% per trade (10 basis points)
+  slippage_bps: 10                # 0.1% slippage estimate
+  benchmark: "SPY"
+
+# Data Configuration
+data:
+  database_path: "data/quant.db"
+  cache_dir: "data/cache"
+  polygon:
+    rate_limit_calls_per_minute: 5  # Free tier limit
+    retry_attempts: 3
+    retry_delay_seconds: 60
+
+# Execution Configuration
+execution:
+  mode: "paper"                   # "paper" or "live"
+  alpaca:
+    base_url: "https://paper-api.alpaca.markets"
+  order_type: "limit"             # Always use limit orders (never market)
+  limit_price_buffer_pct: 0.005   # 0.5% buffer for limit orders
+
+# Monitoring Configuration
+monitoring:
+  log_level: "INFO"
+  log_dir: "logs"
+  metrics_file: "logs/metrics.csv"
+  equity_curve_file: "logs/equity_curve.csv"
+
+# Validation Criteria (before going live)
+validation:
+  min_sharpe_ratio: 1.0
+  max_drawdown: 0.20              # 20%
+  min_win_rate: 0.60              # 60% winning months
+  min_paper_trading_months: 3

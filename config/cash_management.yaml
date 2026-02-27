@@ -1,0 +1,39 @@
+# Cash Management Configuration
+#
+# This configuration controls how the trading system manages cash and prevents
+# order errors due to insufficient funds or pending order conflicts.
+
+cash_buffer:
+  # Minimum cash reserve to always maintain in the account
+  # Orders will not be placed if they would bring cash below this amount
+  minimum_reserve: 2000.0  # $2,000 safety buffer
+
+  # Maximum percentage of available cash to use per single order
+  # This prevents deploying all capital in one trade
+  max_usage_per_order_pct: 0.95  # 95% max
+
+order_cancellation:
+  # Maximum time to wait for order cancellations to complete (seconds)
+  # Increased from 5s to 10s to prevent "insufficient qty" errors
+  max_wait_seconds: 10.0
+
+  # Maximum number of times to retry checking if cancellations completed
+  max_retries: 3
+
+  # Time to wait between retry attempts (seconds)
+  retry_interval: 0.5
+
+margin:
+  # CRITICAL: Never use buying power (borrowed money/margin)
+  # Only use actual cash in the account
+  allow_buying_power: false
+
+logging:
+  # Log detailed cash status at the start of each trading cycle
+  log_cash_status_every_cycle: true
+
+  # Log when orders are skipped due to insufficient cash or conflicts
+  log_skipped_orders: true
+
+  # Log level for cash manager operations (DEBUG, INFO, WARNING, ERROR)
+  log_level: INFO

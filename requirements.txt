@@ -1,0 +1,39 @@
+# Core
+pandas>=2.2.0
+numpy>=1.26.0
+python-dotenv>=1.0.0
+
+# Data & APIs
+alpaca-py>=0.25.0
+polygon-api-client>=1.13.0
+requests>=2.31.0
+
+# Backtesting & Analysis
+vectorbt>=0.26.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Technical Analysis
+pandas-ta>=0.3.14b
+
+# Volatility Modeling
+arch>=6.0.0  # GARCH models for volatility forecasting
+
+# Database
+sqlalchemy>=2.0.0
+
+# Testing
+pytest>=8.0.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+
+# Utilities
+pyyaml>=6.0
+structlog>=24.1.0
+
+# Jupyter (optional for notebooks)
+jupyter>=1.0.0
+ipykernel>=6.29.0
+
+# Type checking
+mypy>=1.8.0
