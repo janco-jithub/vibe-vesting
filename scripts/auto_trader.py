@@ -59,7 +59,6 @@ from risk.profit_optimizer import ProfitOptimizer
 from risk.kelly_sizing import KellyPositionSizer, DEFAULT_STRATEGY_STATS
 from risk.var_calculator import VaRCalculator, RiskMonitor
 from risk.correlation_manager import CorrelationManager
-from strategies.regime_detector import VIXRegimeDetector, MarketRegime
 from execution.alpaca_client import AlpacaClient, AlpacaClientError, TimeoutHTTPAdapter
 from execution.order_manager import OrderManager, RiskLimitExceeded
 from execution.position_tracker import PositionTracker

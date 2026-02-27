@@ -30,14 +30,10 @@ from data.storage import TradingDatabase
 from data.alpaca_data_client import AlpacaDataClient
 from backtest.runner import BacktestRunner
 from strategies.simple_momentum import SimpleMomentumStrategy
-from strategies.long_short_momentum import LongShortMomentumStrategy
 from strategies.dual_momentum import DualMomentumStrategy
 from strategies.swing_momentum import SwingMomentumStrategy
-from strategies.institutional_momentum import InstitutionalMomentumStrategy
 from strategies.volatility_breakout import VolatilityBreakoutStrategy
-# from strategies.pairs_trading import PairsTradingStrategy
-# from strategies.ml_momentum import MLMomentumStrategy
-# from strategies.factor_composite import FactorCompositeStrategy
+from strategies.factor_composite import FactorCompositeStrategy
 
 # Setup logging
 logging.basicConfig(
@@ -140,22 +136,7 @@ def initialize_strategies():
         name="simple_momentum"
     ))
 
-    # 2. Long/Short Momentum
-    logger.info("Initializing LongShortMomentumStrategy...")
-    ls_universe = [
-        'QQQ', 'SPY', 'IWM', 'XLK', 'XLF', 'XLE', 'XLY', 'XLP',
-        'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'JPM'
-    ]
-    strategies.append(LongShortMomentumStrategy(
-        universe=ls_universe,
-        lookback_months=12,
-        skip_month=True,
-        enable_shorting=False,  # Disable shorting for basic backtest
-        long_positions=10,
-        short_positions=0
-    ))
-
-    # 3. Dual Momentum
+    # 2. Dual Momentum
     logger.info("Initializing DualMomentumStrategy...")
     strategies.append(DualMomentumStrategy(
         lookback_days=126,
@@ -173,16 +154,7 @@ def initialize_strategies():
         name="swing_momentum"
     ))
 
-    # 5. Institutional Momentum
-    logger.info("Initializing InstitutionalMomentumStrategy...")
-    strategies.append(InstitutionalMomentumStrategy(
-        momentum_lookback=252,
-        trend_filter_days=200,
-        max_positions=5,
-        name="institutional_momentum"
-    ))
-
-    # 6. Volatility Breakout
+    # 5. Volatility Breakout
     logger.info("Initializing VolatilityBreakoutStrategy...")
     strategies.append(VolatilityBreakoutStrategy(
         entry_lookback=20,
@@ -193,9 +165,9 @@ def initialize_strategies():
         name="volatility_breakout"
     ))
 
-    # 7. Factor Composite - SKIPPED (complex requirements)
-    # 8. ML Momentum - SKIPPED (requires training)
-    # 9. Pairs Trading - SKIPPED (requires pair selection)
+    # 6. Factor Composite
+    logger.info("Initializing FactorCompositeStrategy...")
+    strategies.append(FactorCompositeStrategy())
 
     logger.info(f"Initialized {len(strategies)} strategies")
     return strategies
