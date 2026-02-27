@@ -348,9 +348,9 @@ class VIXRegimeDetector:
         if vix_level < self.vix_low:
             return MarketRegime.BULL, 1.0
         elif vix_level < self.vix_normal:
-            return MarketRegime.SIDEWAYS, 0.8
+            return MarketRegime.SIDEWAYS, 0.9  # 10% reduction (was 20%, too punishing)
         elif vix_level < self.vix_high:
-            return MarketRegime.BEAR, 0.5
+            return MarketRegime.BEAR, 0.65  # 35% reduction (was 50%, left too much cash)
         else:
             return MarketRegime.BEAR, 0.25  # Crisis mode
 
@@ -363,10 +363,10 @@ class VIXRegimeDetector:
         if vix_level < self.vix_low:
             return 1.0
         elif vix_level < self.vix_normal:
-            # Linear interpolation between 1.0 and 0.7
-            return 1.0 - 0.3 * (vix_level - self.vix_low) / (self.vix_normal - self.vix_low)
+            # Linear interpolation between 1.0 and 0.85 (15% max reduction in normal vol)
+            return 1.0 - 0.15 * (vix_level - self.vix_low) / (self.vix_normal - self.vix_low)
         elif vix_level < self.vix_high:
-            # Linear interpolation between 0.7 and 0.4
-            return 0.7 - 0.3 * (vix_level - self.vix_normal) / (self.vix_high - self.vix_normal)
+            # Linear interpolation between 0.85 and 0.60
+            return 0.85 - 0.25 * (vix_level - self.vix_normal) / (self.vix_high - self.vix_normal)
         else:
             return 0.25  # Minimum exposure in crisis

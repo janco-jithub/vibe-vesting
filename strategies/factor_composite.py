@@ -108,9 +108,9 @@ class FactorCompositeStrategy(BaseStrategy):
         momentum_period: int = 252,  # 12-month lookback
         momentum_skip: int = 21,     # Skip 1 month (reversal)
         vol_period: int = 60,        # Volatility calculation period
-        top_percentile: float = 0.20,  # Buy top 20%
+        top_percentile: float = 0.15,  # Buy top 15% (20% diluted signal quality)
         max_positions: int = 10,
-        position_size_pct: float = 0.12,  # 12% per position for 95% capital deployment
+        position_size_pct: float = 0.15,  # 15% per position (12% left too much cash idle)
         rebalance_frequency: str = "weekly",  # weekly or monthly
         universe: Optional[List[str]] = None,
         name: str = "factor_composite"

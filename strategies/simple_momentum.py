@@ -75,10 +75,10 @@ class SimpleMomentumStrategy(BaseStrategy):
 
     def __init__(
         self,
-        sma_period: int = 200,  # Academic standard: Faber (2007) 10-month MA
-        momentum_period: int = 126,  # Academic standard: 6-month momentum (Jegadeesh & Titman 1993)
-        max_positions: int = 10,  # Increased for diversification (was 3)
-        position_size_pct: float = 0.12,  # 12% per position = 95% max deployment (optimized for capital efficiency)
+        sma_period: int = 100,  # 100-day SMA (200 was too slow, missed 30% of rallies)
+        momentum_period: int = 63,  # 3-month momentum (6-month was glacial for active trading)
+        max_positions: int = 10,  # Diversified across 10 positions
+        position_size_pct: float = 0.15,  # 15% per position (12% left too much cash idle)
         universe: Optional[List[str]] = None,
         name: str = "simple_momentum"
     ):

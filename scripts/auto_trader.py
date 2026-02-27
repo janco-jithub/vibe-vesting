@@ -201,34 +201,33 @@ class AutoTrader:
         self.min_trade_interval = timedelta(minutes=15)  # Reduced to 15 min for more active trading
 
         # Risk management settings for bracket orders
-        self.take_profit_pct = 0.03  # 3% take profit (was 8% - REALISTIC)
-        self.stop_loss_pct = 0.02    # 2% stop loss (was 4% - TIGHTER)
+        self.take_profit_pct = 0.08  # 8% take profit target
+        self.stop_loss_pct = 0.04    # 4% stop loss (2% was suicide for TSLA/SOXL/TQQQ)
         self.use_bracket_orders = True  # Always use bracket orders for risk management
 
-        # Advanced profit optimization
-        # QUICK FIX: Tightened parameters to prevent profit give-backs
-        # TIER 2 + BREAKEVEN: Added second profit target and breakeven protection
-        # TIER 3: Added third profit target for big winners
+        # Profit optimization - let winners run, cut losers at the stop
+        # Previous settings were WAY too tight: 3% target, 2% stop = 1.5:1 R:R
+        # New: 8% target, 4% stop = 2:1 R:R minimum
         self.profit_optimizer = ProfitOptimizer(
-            trailing_stop_pct=0.02,  # 2% trailing stop (was 4% - HALVES give-back)
-            trailing_stop_atr_multiple=3.5,  # 3.5x ATR (unchanged for now)
+            trailing_stop_pct=0.035,  # 3.5% trailing stop (2% cut winners on normal pullbacks)
+            trailing_stop_atr_multiple=3.0,  # 3x ATR for volatility-adjusted trailing
             use_atr_trailing=True,
-            first_target_pct=0.03,  # Tier 1: Take profit at +3% (was 8% - REALISTIC target)
-            first_target_size_pct=0.50,  # Tier 1: Sell 50% of position (was 33% - MORE profit taking)
-            second_target_pct=0.06,  # Tier 2: Take profit at +6% (NEW - captures mid-range wins)
-            second_target_size_pct=0.50,  # Tier 2: Sell 50% of remaining (NEW)
-            third_target_pct=0.25,  # Tier 3: Take profit at +25% (NEW - let big winners run!)
-            third_target_size_pct=0.50,  # Tier 3: Sell 50% of remaining (NEW - secure monster gains)
-            breakeven_trigger_pct=0.02,  # Move stop to breakeven at +2% (NEW - protects all positions)
-            profit_lock_pct=0.005,  # Lock +0.5% profit at breakeven (NEW - small cushion)
+            first_target_pct=0.08,  # Tier 1: Take profit at +8% (3% was cutting winners way too early)
+            first_target_size_pct=0.33,  # Tier 1: Sell 33% (50% was giving away too much upside)
+            second_target_pct=0.15,  # Tier 2: Take profit at +15%
+            second_target_size_pct=0.50,  # Tier 2: Sell 50% of remaining
+            third_target_pct=0.25,  # Tier 3: Take profit at +25% (big winners)
+            third_target_size_pct=0.50,  # Tier 3: Sell 50% of remaining
+            breakeven_trigger_pct=0.03,  # Move stop to breakeven at +3% (was 2%, too tight)
+            profit_lock_pct=0.005,  # Lock +0.5% profit at breakeven
             max_scale_ins=2,  # Allow pyramiding up to 2 times
             scale_in_profit_threshold=0.03,  # Add at +3%
-            fast_exit_loss_pct=0.015,  # Quick exit at -1.5% (was 2% - TIGHTER)
-            avoid_open_minutes=5,  # 5 minutes after open (reduced from 15)
-            reduce_size_friday_pct=0.70,  # 30% reduction on Fridays for weekend gap risk
+            fast_exit_loss_pct=0.04,  # Align with stop loss (1.5% was tighter than the actual stop!)
+            avoid_open_minutes=5,  # 5 minutes after open
+            reduce_size_friday_pct=0.85,  # 15% reduction on Fridays (30% was excessive with stops)
             vix_high_threshold=25.0,
             high_vol_stop_multiplier=1.5,
-            high_vol_size_reduction=0.67  # 33% smaller in high vol
+            high_vol_size_reduction=0.75  # 25% smaller in high vol (was 33%)
         )
         self.position_tracker = PositionTracker(
             profit_optimizer=self.profit_optimizer,
