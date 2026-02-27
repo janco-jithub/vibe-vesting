@@ -96,16 +96,27 @@ Unlike the "trust me bro" approach taught in most courses, this system has:
 
 ## Performance
 
-Let's be honest about backtests. Here's what the system *actually* did, not what I cherry-picked to sell you a course:
+Let's be honest about backtests. Here's what the system *actually* did (2021-2026, $100K starting capital), not what I cherry-picked to sell you a course:
 
-| Metric | Our System | Your Guru's "Guaranteed Returns" |
-|--------|-----------|----------------------------------|
-| Sharpe | ~0.45 | "10,000% (results not typical)" |
-| Max Drawdown | -35% to -71% | Never mentioned |
-| Win Rate | 44% | "98% win rate!!!" (on 3 trades) |
-| Transparency | Open source | "Pay $997 to find out" |
+| Strategy | Return | Sharpe | Max DD | Win Rate | Guru Equivalent |
+|----------|--------|--------|--------|----------|-----------------|
+| Factor Composite | +26% | 0.18 | -43% | 38% | "$2,997 mentorship" |
+| Simple Momentum | +9.5% | -0.20 | -15% | 32% | "FREE signals group" |
+| SPY Buy & Hold | +85% | ~1.0 | -25% | N/A | "Just buy the index bro" |
 
-**Is this good?** It's... honest. Which is more than any "FREE WEBINAR" has ever been.
+**Yes, SPY beat both strategies.** You know what that means? It means we're honest. Unlike the guy on YouTube who backtested to 2009 and said "if you invested $1,000 you'd have $47 million."
+
+### Bugs We Found and Fixed (the real alpha)
+
+| Bug | Impact | Status |
+|-----|--------|--------|
+| VIX multiplier applied TWICE | Positions 56% smaller than intended. $97K sitting as cash. | Fixed |
+| Quality score always = 0.40 | 25% of our best strategy literally doing nothing | Fixed |
+| Pyramiding needs 300% gain | Compared 0.03 with >= 3.0 (off by 100x) | Fixed |
+| Trailing stops reset every 5 min | Canceled and re-placed each cycle, losing high-water mark | Fixed |
+| Kelly sizing used fantasy stats | Thought win rate was 55% when actual is 34% | Fixed |
+
+> "The real alpha was the bugs we fixed along the way" - Warren Buffett, probably
 
 ---
 

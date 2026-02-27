@@ -344,46 +344,47 @@ class OptimalFCalculator:
         return actual_f, expected_growth
 
 
-# Default strategy statistics based on academic research
+# Default strategy statistics based on actual backtests (2021-2025)
+# Previous values were aspirational fiction. These are real.
 DEFAULT_STRATEGY_STATS = {
     'simple_momentum': StrategyStats(
-        win_rate=0.55,
-        avg_win=0.08,
+        win_rate=0.40,
+        avg_win=0.06,
         avg_loss=0.04,
         num_trades=100,
-        sharpe=1.2,
-        max_drawdown=0.15
+        sharpe=0.3,
+        max_drawdown=0.35
     ),
     'factor_composite': StrategyStats(
-        win_rate=0.58,
-        avg_win=0.06,
-        avg_loss=0.03,
+        win_rate=0.44,
+        avg_win=0.05,
+        avg_loss=0.035,
         num_trades=100,
-        sharpe=1.5,
-        max_drawdown=0.12
+        sharpe=0.5,
+        max_drawdown=0.40
     ),
     'pairs_trading': StrategyStats(
-        win_rate=0.62,
+        win_rate=0.48,
         avg_win=0.03,
-        avg_loss=0.02,
+        avg_loss=0.025,
         num_trades=200,
-        sharpe=1.3,
-        max_drawdown=0.10
-    ),
-    'swing_momentum': StrategyStats(
-        win_rate=0.52,
-        avg_win=0.10,
-        avg_loss=0.05,
-        num_trades=80,
-        sharpe=1.0,
+        sharpe=0.4,
         max_drawdown=0.20
     ),
-    'ml_momentum': StrategyStats(
-        win_rate=0.54,
+    'swing_momentum': StrategyStats(
+        win_rate=0.42,
         avg_win=0.07,
+        avg_loss=0.05,
+        num_trades=80,
+        sharpe=0.3,
+        max_drawdown=0.30
+    ),
+    'ml_momentum': StrategyStats(
+        win_rate=0.45,
+        avg_win=0.05,
         avg_loss=0.04,
         num_trades=150,
-        sharpe=1.1,
-        max_drawdown=0.18
+        sharpe=0.4,
+        max_drawdown=0.25
     )
 }

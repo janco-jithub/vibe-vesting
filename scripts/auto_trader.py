@@ -928,33 +928,44 @@ class AutoTrader:
                         )
 
                     elif action.action == 'update_stop':
-                        # Update trailing stop
-                        # Cancel existing stop orders and wait for confirmation
+                        # Update trailing stop - but don't cancel/replace if we already
+                        # have a trailing stop at the correct percentage (resetting it
+                        # loses the high-water mark that Alpaca tracks)
+                        position = self.position_tracker.positions.get(action.symbol)
+                        if not position:
+                            continue
+
+                        # Check if there's already an active trailing stop for this symbol
+                        open_orders = self.alpaca.get_open_orders_for_symbol(action.symbol)
+                        has_trailing_stop = any(
+                            o.get('type') == 'trailing_stop' for o in open_orders
+                        )
+
+                        if has_trailing_stop:
+                            # Don't replace - Alpaca's trailing stop is already tracking
+                            # the high-water mark. Replacing resets it and gives back gains.
+                            self.position_tracker.update_stop_loss(
+                                symbol=action.symbol,
+                                new_stop=action.stop_loss
+                            )
+                            logger.debug(
+                                f"TRAILING STOP: {action.symbol} tracker updated to "
+                                f"${action.stop_loss:.2f} (Alpaca trailing stop preserved)"
+                            )
+                            continue
+
+                        # No trailing stop exists - create one
+                        # Cancel any other stop orders first
                         cancelled = self.alpaca.cancel_orders_for_symbol(action.symbol)
                         if cancelled > 0:
                             max_wait = 10.0
                             elapsed = 0.0
-                            retries = 0
-                            while elapsed < max_wait and retries < 3:
+                            while elapsed < max_wait:
                                 time.sleep(0.5)
                                 elapsed += 0.5
-                                open_orders = self.alpaca.get_open_orders_for_symbol(action.symbol)
-                                if len(open_orders) == 0:
-                                    logger.info(
-                                        f"Verified: all orders cancelled for {action.symbol} "
-                                        f"after {elapsed:.1f}s"
-                                    )
+                                remaining = self.alpaca.get_open_orders_for_symbol(action.symbol)
+                                if len(remaining) == 0:
                                     break
-                                retries += 1
-                            else:
-                                if open_orders:
-                                    logger.error(
-                                        f"ABORT update_stop: {action.symbol} still has "
-                                        f"{len(open_orders)} pending orders after {elapsed:.1f}s"
-                                    )
-                                    continue
-
-                        position = self.position_tracker.positions[action.symbol]
 
                         # Submit new trailing stop order
                         order = self.alpaca.submit_trailing_stop_order(
@@ -979,7 +990,7 @@ class AutoTrader:
                         })
 
                         logger.info(
-                            f"TRAILING STOP: {action.symbol} raised to ${action.stop_loss:.2f} "
+                            f"TRAILING STOP: {action.symbol} set at ${action.stop_loss:.2f} "
                             f"({action.reason})"
                         )
 
@@ -1154,11 +1165,11 @@ class AutoTrader:
                             # Allow pyramiding if:
                             # 1. Position is profitable (>3%)
                             # 2. Haven't scaled in too many times (max 2 scale-ins)
-                            if unrealized_pnl_pct >= 3.0 and tracked_pos.scale_ins < 2:
+                            if unrealized_pnl_pct >= 0.03 and tracked_pos.scale_in_count < 2:
                                 can_pyramid = True
                                 logger.info(
                                     f"Pyramiding opportunity for {symbol}: "
-                                    f"P&L={unrealized_pnl_pct:.1f}%, scale_ins={tracked_pos.scale_ins}/2"
+                                    f"P&L={unrealized_pnl_pct*100:.1f}%, scale_ins={tracked_pos.scale_in_count}/2"
                                 )
 
                         if not can_pyramid:
@@ -1180,12 +1191,12 @@ class AutoTrader:
                         current_positions={s: p["market_value"] for s, p in positions.items()}
                     )
 
-                    # Apply VIX regime multiplier to reduce position size in high volatility
-                    target_value = target_value * position_multiplier
+                    # VIX regime multiplier is already applied inside strategy.calculate_position_size()
+                    # via strategy.regime_multiplier (set on line 1097). Do NOT apply again here.
                     if position_multiplier < 1.0:
                         logger.info(
-                            f"{symbol}: VIX regime adjustment - position size reduced by "
-                            f"{(1-position_multiplier)*100:.0f}% (VIX={self.current_vix:.1f})"
+                            f"{symbol}: VIX regime applied via strategy sizing "
+                            f"({position_multiplier:.2f}x, VIX={self.current_vix:.1f})"
                         )
 
                     # Get current price
@@ -1308,7 +1319,7 @@ class AutoTrader:
                                 logger.info(
                                     f"PYRAMID (SCALE IN): BUY {shares} {symbol} @ ${limit_price:.2f}, "
                                     f"SL: ${stop_loss_price:.2f}, "
-                                    f"Scale-ins: {self.position_tracker.positions[symbol].scale_ins}/2"
+                                    f"Scale-ins: {self.position_tracker.positions[symbol].scale_in_count}/2"
                                 )
                             else:
                                 # New position - profit optimizer handles take profits via scale-outs

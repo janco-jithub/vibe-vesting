@@ -238,9 +238,13 @@ class FactorCompositeStrategy(BaseStrategy):
             current = close.iloc[-1]
             recovery = current / recent_high
 
-            # Combine (equal weight)
+            # Combine (weighted)
+            # stability = 1/(vol+0.001), higher = less volatile = higher quality
+            # positive_days = fraction of up days [0, 1]
+            # recovery = current/recent_high [0, 1]
+            # stability is unbounded, but rank normalization downstream handles scaling
             quality = (
-                0.40 * stability / stability if stability > 0 else 0 +
+                0.40 * stability +
                 0.30 * positive_days +
                 0.30 * recovery
             )
