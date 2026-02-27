@@ -1134,10 +1134,45 @@ class AutoTrader:
             )
             return executed
 
-        # Sort signals by strength (strongest first)
-        signals = sorted(signals, key=lambda s: s.strength, reverse=True)
+        # Separate BUY and SELL signals and process independently.
+        # Previously, mixing them in a single sorted list meant SELL signals for
+        # unheld stocks and BUY signals for already-held stocks consumed all 5
+        # processing slots, preventing any NEW positions from being opened.
+        buy_signals_list = sorted(
+            [s for s in signals if s.signal_type == SignalType.BUY],
+            key=lambda s: s.strength, reverse=True
+        )
+        sell_signals_list = sorted(
+            [s for s in signals if s.signal_type == SignalType.SELL],
+            key=lambda s: s.strength, reverse=True
+        )
 
-        for signal in signals[:5]:  # Process top 5 signals max per check
+        # Prioritize NEW positions: move signals for unheld stocks to the front
+        new_position_signals = [
+            s for s in buy_signals_list
+            if positions.get(s.symbol, {}).get("market_value", 0.0) <= 0
+        ]
+        existing_position_signals = [
+            s for s in buy_signals_list
+            if positions.get(s.symbol, {}).get("market_value", 0.0) > 0
+        ]
+        # New positions first, then pyramiding candidates
+        ordered_buy_signals = new_position_signals + existing_position_signals
+
+        # Process: up to 5 SELL exits, then up to 5 BUY entries
+        prioritized_signals = sell_signals_list[:5] + ordered_buy_signals[:10]
+
+        max_new_buys = 5
+        buys_executed = 0
+
+        logger.info(
+            f"Signal processing [{strategy_name}]: "
+            f"{len(new_position_signals)} NEW buy candidates, "
+            f"{len(existing_position_signals)} existing position buys, "
+            f"{len(sell_signals_list)} sell signals"
+        )
+
+        for signal in prioritized_signals:
             symbol = signal.symbol
 
             # Skip if recently traded
@@ -1149,6 +1184,10 @@ class AutoTrader:
                 current_position = positions.get(symbol, {}).get("market_value", 0.0)
 
                 if signal.signal_type == SignalType.BUY:
+                    # Cap total new BUY executions per cycle
+                    if buys_executed >= max_new_buys:
+                        break
+
                     # Check if we already have a position - allow pyramiding if profitable
                     if current_position > 0:
                         # Get position details for pyramiding check
@@ -1374,6 +1413,7 @@ class AutoTrader:
                         "strength": signal.strength,
                         "order_id": order_id
                     })
+                    buys_executed += 1
 
                     self.recent_trades[symbol] = datetime.now()
 

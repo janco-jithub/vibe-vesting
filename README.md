@@ -138,6 +138,7 @@ Every trading course shows you the ONE backtest that worked. We're showing you t
 | Pyramiding needs 300% gain | Compared 0.03 with >= 3.0 (off by 100x). Not even NVDA does that in a week. | Fixed |
 | Trailing stops reset every 5 min | Canceled and re-placed each cycle, losing high-water mark. Self-sabotage speedrun. | Fixed |
 | Kelly sizing used fantasy stats | Thought win rate was 55% when actual is 34%. Aspirational math. | Fixed |
+| Signal processor only checked 5 signals | Mixed BUY/SELL in one list, existing positions consumed all slots. $74K cash sat idle while the bot kept trying to buy stocks it already owned. Like applying to a job you already have. | Fixed |
 
 > "The real alpha was the bugs we fixed along the way" - Warren Buffett, probably
 
