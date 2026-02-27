@@ -345,23 +345,26 @@ class OptimalFCalculator:
 
 
 # Default strategy statistics based on actual backtests (2021-2025)
-# Previous values were aspirational fiction. These are real.
+# Updated for wider stop regime (4% stops, 3.5% trailing, 8% first target):
+# - Fewer whipsaws → higher win rate
+# - Wider trailing → larger avg wins
+# - 4% stops → avg loss matches stop
 DEFAULT_STRATEGY_STATS = {
     'simple_momentum': StrategyStats(
-        win_rate=0.40,
-        avg_win=0.06,
+        win_rate=0.48,
+        avg_win=0.08,
         avg_loss=0.04,
         num_trades=100,
-        sharpe=0.3,
-        max_drawdown=0.35
+        sharpe=0.5,
+        max_drawdown=0.30
     ),
     'factor_composite': StrategyStats(
-        win_rate=0.44,
-        avg_win=0.05,
-        avg_loss=0.035,
+        win_rate=0.50,
+        avg_win=0.07,
+        avg_loss=0.04,
         num_trades=100,
-        sharpe=0.5,
-        max_drawdown=0.40
+        sharpe=0.6,
+        max_drawdown=0.35
     ),
     'pairs_trading': StrategyStats(
         win_rate=0.48,
@@ -372,19 +375,19 @@ DEFAULT_STRATEGY_STATS = {
         max_drawdown=0.20
     ),
     'swing_momentum': StrategyStats(
-        win_rate=0.42,
-        avg_win=0.07,
+        win_rate=0.45,
+        avg_win=0.08,
         avg_loss=0.05,
         num_trades=80,
-        sharpe=0.3,
-        max_drawdown=0.30
-    ),
-    'ml_momentum': StrategyStats(
-        win_rate=0.45,
-        avg_win=0.05,
-        avg_loss=0.04,
-        num_trades=150,
         sharpe=0.4,
         max_drawdown=0.25
+    ),
+    'ml_momentum': StrategyStats(
+        win_rate=0.47,
+        avg_win=0.06,
+        avg_loss=0.04,
+        num_trades=150,
+        sharpe=0.5,
+        max_drawdown=0.22
     )
 }

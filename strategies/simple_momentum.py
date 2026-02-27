@@ -105,7 +105,7 @@ class SimpleMomentumStrategy(BaseStrategy):
         self.kelly_sizer = KellyPositionSizer(
             kelly_fraction=0.25,  # Quarter Kelly (conservative)
             max_position_pct=self.position_size_pct,  # Use strategy max as ceiling
-            min_position_pct=0.02  # Minimum 2% position
+            min_position_pct=0.05  # Minimum 5% position ($5K on $100K)
         )
         # Load default stats for simple_momentum
         if 'simple_momentum' in DEFAULT_STRATEGY_STATS:

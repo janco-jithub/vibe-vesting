@@ -256,7 +256,7 @@ class AutoTrader:
         self.kelly_sizer = KellyPositionSizer(
             kelly_fraction=0.25,  # Quarter Kelly for safety (balance growth vs drawdown)
             max_position_pct=0.20,  # INCREASED: Aligned with PositionSizer (was 0.15)
-            min_position_pct=0.02
+            min_position_pct=0.05  # Minimum 5% position ($5K on $100K)
         )
         # Initialize with default strategy stats
         for strat_name, stats in DEFAULT_STRATEGY_STATS.items():
